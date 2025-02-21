@@ -66,12 +66,12 @@ async function getPlayerInfo() {
     }
 }
 
-// 🎨 Draws or Updates the Trust Factor Chart
+// 🎨 Draw or Update the Trust Factor Chart
 function drawTrustFactorGraph(trustFactor) {
     const ctx = document.getElementById("trustFactorChart").getContext("2d");
 
-    // Destroy the old chart instance if it exists
-    if (trustFactorChart) {
+    // 🔥 Fix: Check if `trustFactorChart` is a valid Chart.js instance before calling `.destroy()`
+    if (trustFactorChart instanceof Chart) {
         trustFactorChart.destroy();
     }
 
@@ -111,7 +111,6 @@ function drawTrustFactorGraph(trustFactor) {
         }
     });
 }
-
 function sharePage() {
     const shareUrl = window.location.href;
 
