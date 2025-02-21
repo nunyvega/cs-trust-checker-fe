@@ -12,13 +12,24 @@ async function getPlayerInfo() {
         const response = await fetch(`${BACKEND_URL}/api/player/${steamId}`);
         const data = await response.json();
 
-        if (data.response && data.response.players.length > 0) {
-            const player = data.response.players[0];
+        if (data.name) {
             document.getElementById("output").innerHTML = `
                 <div class="mt-4 p-4 bg-gray-700 rounded-lg shadow">
-                    <img src="${player.avatarfull}" alt="Avatar" class="rounded-full mx-auto mb-2">
-                    <p class="text-lg font-semibold">${player.personaname}</p>
-                    <a href="${player.profileurl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
+                    <img src="${data.avatar}" alt="Avatar" class="rounded-full mx-auto mb-2">
+                    <p class="text-lg font-semibold">${data.name}</p>
+                    <a href="${data.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
+                    <p><strong>Steam ID:</strong> ${data.steamId}</p>
+                    <p><strong>Last Log Off:</strong> ${data.lastLogOff}</p>
+                    <p><strong>Account Age:</strong> ${data.accountAge}</p>
+                    <p><strong>CS2 Hours Played:</strong> ${data.hoursPlayed}</p>
+                    <p class="${data.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                        <strong>VAC Bans:</strong> ${data.vacBans}
+                    </p>
+                    <p class="${data.gameBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                        <strong>Game Bans:</strong> ${data.gameBans}
+                    </p>
+                    <p><strong>Community Banned:</strong> ${data.communityBanned ? 'Yes' : 'No'}</p>
+                    <p><strong>Economy Ban:</strong> ${data.economyBan}</p>
                 </div>
             `;
         } else {
