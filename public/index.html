@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
     <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg border border-yellow-500">
@@ -19,8 +19,8 @@
                 Check Trust Factor
             </button>
         </div>
-
         <div id="output" class="mt-6 text-center"></div>
+        <canvas id="trustFactorChart" class="mt-6"></canvas>
     </div>
 </body>
 </html>

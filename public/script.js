@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const steamId = urlParams.get("steamId");
 
     if (steamId) {
-        document.getElementById("steamId").value = steamId; // Prefill input
-        getPlayerInfo(); // Automatically fetch player data
+        document.getElementById("steamId").value = steamId;
+        getPlayerInfo();
     }
 });
 
@@ -14,7 +14,7 @@ async function getPlayerInfo() {
     const steamId = document.getElementById("steamId").value;
     if (!steamId) return alert("Please enter a Steam ID");
 
-    // Update URL to include Steam ID (for sharing)
+    // Update URL for sharing
     const newUrl = `${window.location.origin}${window.location.pathname}?steamId=${steamId}`;
     window.history.pushState({}, '', newUrl);
 
@@ -24,7 +24,7 @@ async function getPlayerInfo() {
 
         if (data.name) {
             document.getElementById("output").innerHTML = `
-                <div id="player-card" class="mt-4 p-6 bg-gray-700 border border-yellow-500 shadow-md">
+                <div id="player-card" class="mt-4 p-6 bg-gray-700 rounded-lg border border-yellow-500 shadow-md">
                     <img src="${data.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md">
                     <p class="text-xl font-bold">${data.name}</p>
                     <a href="${data.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
@@ -32,7 +32,7 @@ async function getPlayerInfo() {
                     <div class="mt-4 text-left space-y-2">
                         <p><strong>Steam ID:</strong> ${data.steamId}</p>
                         <p><strong>Last Log Off:</strong> ${data.lastLogOff}</p>
-                        <p><strong>Account Age:</strong> ${data.accountAge}</p>
+                        <p><strong>Account Age:</strong> ${data.accountAge} years</p>
                         <p><strong>CS2 Hours Played:</strong> ${data.hoursPlayed}</p>
                         <p class="${data.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
                             <strong>VAC Bans:</strong> ${data.vacBans}
@@ -42,13 +42,21 @@ async function getPlayerInfo() {
                         </p>
                         <p><strong>Community Banned:</strong> ${data.communityBanned ? 'Yes' : 'No'}</p>
                         <p><strong>Economy Ban:</strong> ${data.economyBan}</p>
+
+                        <p class="text-xl mt-4 font-bold ${data.trustFactor >= 700 ? 'text-green-400' : data.trustFactor >= 400 ? 'text-yellow-400' : 'text-red-400'}">
+                            🔥 Trust Factor Score: ${data.trustFactor}/1000
+                        </p>
                     </div>
                 </div>
+                <canvas id="trustFactorChart" class="mt-6"></canvas>
                 <div class="mt-4 flex justify-center space-x-4">
                     <button onclick="sharePage()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Share Page</button>
                     <button onclick="shareCard()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Share Card</button>
                 </div>
             `;
+
+            // Update or create the bar chart
+            drawTrustFactorGraph(data.trustFactor);
         } else {
             document.getElementById("output").innerHTML = `<p class="text-red-400">No player found.</p>`;
         }
@@ -56,6 +64,52 @@ async function getPlayerInfo() {
         console.error("Error fetching data:", error);
         document.getElementById("output").innerHTML = `<p class="text-red-400">Error fetching data.</p>`;
     }
+}
+
+// 🎨 Draws or Updates the Trust Factor Chart
+function drawTrustFactorGraph(trustFactor) {
+    const ctx = document.getElementById("trustFactorChart").getContext("2d");
+
+    // Destroy the old chart instance if it exists
+    if (trustFactorChart) {
+        trustFactorChart.destroy();
+    }
+
+    // Create the new bar chart
+    trustFactorChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: ["Trust Factor"],
+            datasets: [{
+                label: "Trust Factor Score",
+                data: [trustFactor],
+                backgroundColor: trustFactor >= 700 ? "#10B981" : trustFactor >= 400 ? "#F59E0B" : "#EF4444",
+                borderColor: "#fff",
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 1000,
+                    ticks: {
+                        stepSize: 200,
+                        color: "#fff"
+                    },
+                    grid: {
+                        color: "rgba(255, 255, 255, 0.2)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
 }
 
 function sharePage() {
