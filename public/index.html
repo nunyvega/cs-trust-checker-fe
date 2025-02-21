@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS Trust Factor Checker</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="script.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Counter-Strike Trust Factor Checker</h1>
-        <p>for testing purposes, id: 76561198031343585</p>
-        <input type="text" id="steamId" placeholder="Enter Steam ID">
-        <button onclick="getPlayerInfo()">Check</button>
-        <div id="output"></div>
+<body class="bg-gray-900 text-white">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-2xl font-bold text-center mb-4">CS Trust Factor Checker</h1>
+            <input type="text" id="steamId" class="w-full p-2 text-black rounded border-gray-400 border" placeholder="Enter Steam ID">
+            <button onclick="getPlayerInfo()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Check
+            </button>
+            <div id="output" class="mt-4 text-center"></div>
+        </div>
     </div>
 </body>
 </html>
