@@ -75,8 +75,20 @@ async function shareCard() {
         return;
     }
 
+    // Ensure the profile image is properly loaded
+    const img = playerCard.querySelector("img");
+    if (img) {
+        const newImg = await loadImage(img.src); // Load image with CORS handling
+        img.src = newImg;
+    }
+
     try {
-        const canvas = await html2canvas(playerCard);
+        const canvas = await html2canvas(playerCard, {
+            useCORS: true, // Enable cross-origin image capturing
+            allowTaint: true, // Allows tainted images (not always needed)
+            scale: 2 // Higher resolution
+        });
+
         const image = canvas.toDataURL("image/png");
 
         const link = document.createElement("a");
@@ -89,4 +101,15 @@ async function shareCard() {
         console.error("Error generating image:", error);
         alert("Failed to generate image.");
     }
+}
+
+// Helper function to properly load an image before rendering
+async function loadImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Ensure cross-origin loading
+        img.src = url;
+        img.onload = () => resolve(img.src);
+        img.onerror = (e) => reject(e);
+    });
 }
