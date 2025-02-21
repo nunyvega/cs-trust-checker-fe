@@ -8,7 +8,7 @@ async function getPlayerInfo() {
     const steamId = document.getElementById("steamId").value;
     if (!steamId) return alert("Please enter a Steam ID");
 
-    // Update URL to include Steam ID as a query parameter
+    // Update URL to include Steam ID (for sharing)
     const newUrl = `${window.location.origin}${window.location.pathname}?steamId=${steamId}`;
     window.history.pushState({}, '', newUrl);
 
