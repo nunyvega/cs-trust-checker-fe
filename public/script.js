@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://glorious-space-potato-vpvvqvrqg93xjv7-3000.app.github.dev/";
+const BACKEND_URL = "https://glorious-space-potato-vpvvqvrqg93xjv7-3000.app.github.dev";
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("steamId").value = "76561197960434622";  // Prefilled Steam ID
