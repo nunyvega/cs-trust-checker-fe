@@ -6,17 +6,58 @@
     <title>CS Trust Factor Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="script.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500&display=swap');
+
+        body {
+            background-image: url('https://wallpapercave.com/wp/wp2563587.jpg'); /* CS2 background */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .container {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #ffd700; /* CS gold */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ffd700;
+            color: white;
+            padding: 10px;
+        }
+
+        button {
+            background: linear-gradient(90deg, #ffae00, #ffdd44);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #ffd700, #ffae00);
+        }
+
+        .avatar {
+            border: 3px solid #ffdd44;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(255, 215, 0, 0.8);
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h1 class="text-2xl font-bold text-center mb-4">CS Trust Factor Checker</h1>
-            <input type="text" id="steamId" class="w-full p-2 text-black rounded border-gray-400 border" placeholder="Enter Steam ID">
-            <button onclick="getPlayerInfo()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Check
-            </button>
-            <div id="output" class="mt-4 text-center"></div>
-        </div>
+<body class="flex items-center justify-center min-h-screen text-white">
+    <div class="container text-center w-full max-w-lg">
+        <h1 class="text-3xl text-yellow-400 mb-4">CS Trust Factor Checker</h1>
+        <input type="text" id="steamId" class="w-full p-2 text-lg mb-4 rounded" placeholder="Enter Steam ID">
+        <button onclick="getPlayerInfo()" class="w-full rounded">Check</button>
+        <div id="output" class="mt-4"></div>
     </div>
 </body>
 </html>

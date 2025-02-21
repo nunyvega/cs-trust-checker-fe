@@ -14,9 +14,9 @@ async function getPlayerInfo() {
 
         if (data.name) {
             document.getElementById("output").innerHTML = `
-                <div class="mt-4 p-4 bg-gray-700 rounded-lg shadow">
-                    <img src="${data.avatar}" alt="Avatar" class="rounded-full mx-auto mb-2">
-                    <p class="text-lg font-semibold">${data.name}</p>
+                <div class="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg border-2 border-yellow-400">
+                    <img src="${data.avatar}" alt="Avatar" class="avatar mx-auto mb-2">
+                    <p class="text-xl font-bold">${data.name}</p>
                     <a href="${data.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
                     <p><strong>Steam ID:</strong> ${data.steamId}</p>
                     <p><strong>Last Log Off:</strong> ${data.lastLogOff}</p>
