@@ -1,7 +1,13 @@
 const BACKEND_URL = "https://glorious-space-potato-vpvvqvrqg93xjv7-3000.app.github.dev";
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("steamId").value = "76561197960434622";  // Prefilled Steam ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const steamId = urlParams.get("steamId");
+
+    if (steamId) {
+        document.getElementById("steamId").value = steamId; // Prefill input
+        getPlayerInfo(); // Automatically fetch player data
+    }
 });
 
 async function getPlayerInfo() {
