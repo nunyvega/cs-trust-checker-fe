@@ -24,7 +24,7 @@ async function getPlayerInfo() {
 
         if (data.name) {
             document.getElementById("output").innerHTML = `
-                <div id="player-card" class="mt-4 p-6 bg-gray-700 rounded-lg border border-yellow-500 shadow-md">
+                <div id="player-card" class="mt-4 p-6 bg-gray-700 border border-yellow-500 shadow-md">
                     <img src="${data.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md">
                     <p class="text-xl font-bold">${data.name}</p>
                     <a href="${data.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
