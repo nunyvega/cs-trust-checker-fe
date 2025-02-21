@@ -102,7 +102,7 @@ async function shareCard() {
         link.download = "CS_Trust_Factor.png";
         link.click();
 
-        alert("Card image saved! You can now share it.");
+        alert("Card image saved!! You can now share it.");
     } catch (error) {
         console.error("Error generating image:", error);
         alert("Failed to generate image.");
