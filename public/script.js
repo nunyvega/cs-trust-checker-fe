@@ -1,5 +1,6 @@
 const BACKEND_URL = "https://glorious-space-potato-vpvvqvrqg93xjv7-3000.app.github.dev";
 
+console.log('loaded v1');
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const steamId = urlParams.get("steamId");
