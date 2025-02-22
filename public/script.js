@@ -24,31 +24,51 @@ async function getPlayerInfo() {
         const response = await fetch(`${BACKEND_URL}/api/player/${steamId}`);
         const data = await response.json();
 
-        if (data.name) {
+        if (data.steam.name) {
             document.getElementById("output").innerHTML = `
                 <div id="player-card" class="mt-4 p-6 bg-gray-700 rounded-lg border border-yellow-500 shadow-md text-center">
-                    <img src="${data.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md">
-                    <p class="text-xl font-bold">${data.name}</p>
-                    <a href="${data.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Profile</a>
+                    <img src="${data.steam.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md">
+                    <p class="text-xl font-bold">${data.steam.name}</p>
+                    <a href="${data.steam.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Steam Profile</a>
 
                     <div class="mt-4 text-left space-y-2 text-gray-300">
-                        <p><strong>🆔 Steam ID:</strong> ${data.steamId}</p>
-                        <p><strong>📅 Last Log Off:</strong> ${data.lastLogOff}</p>
-                        <p><strong>🕰️ Account Age:</strong> ${data.accountAge} years</p>
-                        <p><strong>🎮 CS2 Hours Played:</strong> ${data.hoursPlayed}</p>
-                        <p class="${data.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
-                            <strong>🚫 VAC Bans:</strong> ${data.vacBans}
+                        <p><strong>🆔 Steam ID:</strong> ${data.steam.steamId}</p>
+                        <p><strong>📅 Last Log Off:</strong> ${data.steam.lastLogOff}</p>
+                        <p><strong>🕰️ Account Age:</strong> ${data.steam.accountAge} years</p>
+                        <p><strong>🎮 CS2 Hours Played:</strong> ${data.steam.hoursPlayed}</p>
+                        <p class="${data.steam.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                            <strong>🚫 VAC Bans:</strong> ${data.steam.vacBans}
                         </p>
-                        <p class="${data.gameBans > 0 ? 'text-red-400' : 'text-green-400'}">
-                            <strong>🚫 Game Bans:</strong> ${data.gameBans}
+                        <p class="${data.steam.gameBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                            <strong>🚫 Game Bans:</strong> ${data.steam.gameBans}
                         </p>
-                        <p><strong>🛑 Community Banned:</strong> ${data.communityBanned ? 'Yes' : 'No'}</p>
-                        <p><strong>💰 Economy Ban:</strong> ${data.economyBan}</p>
+                        <p><strong>🛑 Community Banned:</strong> ${data.steam.communityBanned ? 'Yes' : 'No'}</p>
+                        <p><strong>💰 Economy Ban:</strong> ${data.steam.economyBan}</p>
 
                         <p class="text-2xl mt-4 font-bold ${data.trustFactor >= 700 ? 'text-green-400' : data.trustFactor >= 400 ? 'text-yellow-400' : 'text-red-400'}">
                             🔥 Trust Factor Score: ${data.trustFactor}/1000
                         </p>
                     </div>
+
+                    ${data.faceit.nickname ? `
+                        <h2 class="text-lg mt-6 font-bold text-yellow-400">🔥 Faceit Profile</h2>
+                        <div class="bg-gray-800 p-4 rounded-lg border border-blue-500 text-center">
+                            <img src="${data.faceit.avatar}" alt="Faceit Avatar" class="mx-auto w-16 h-16 rounded-full">
+                            <p class="text-lg font-semibold">${data.faceit.nickname}</p>
+                            <p><strong>🌎 Region:</strong> ${data.faceit.region}</p>
+                            <p><strong>⚡ Skill Level:</strong> ${data.faceit.skill_level}/10</p>
+                            <p class="text-xl font-bold ${data.faceit.elo >= 2000 ? 'text-green-400' : data.faceit.elo >= 1500 ? 'text-yellow-400' : 'text-red-400'}">
+                                🔥 Faceit ELO: ${data.faceit.elo}
+                            </p>
+
+                            ${data.faceit.last_match ? `
+                                <h3 class="text-lg mt-4 font-bold text-blue-400">🆚 Last Match</h3>
+                                <p><strong>Map:</strong> ${data.faceit.last_match.map}</p>
+                                <p><strong>Score:</strong> ${data.faceit.last_match.score}</p>
+                                <p><strong>Result:</strong> ${data.faceit.last_match.result}</p>
+                            ` : ""}
+                        </div>
+                    ` : `<p class="mt-4 text-gray-400">⚠️ No Faceit profile found.</p>`}
                 </div>
 
                 <div class="mt-4 flex justify-center space-x-4">
@@ -64,6 +84,7 @@ async function getPlayerInfo() {
         document.getElementById("output").innerHTML = `<p class="text-red-400 text-center">⚠️ Error fetching data.</p>`;
     }
 }
+
 
 function sharePage() {
     const shareUrl = window.location.href;
