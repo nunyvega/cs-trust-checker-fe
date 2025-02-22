@@ -3,40 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.ico">
     <title>CS Trust Factor Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" type="image/png" href="favicon.ico">
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
-    <div class="w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-yellow-400 text-center mb-4 flex items-center justify-center gap-2">
-            <span>🎯 CS Trust Factor Checker</span>
-        </h1>
-        <p class="text-sm text-gray-400 text-center">Demo ID: <strong>76561197960434622</strong></p>
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg border border-yellow-500">
+        <h1 class="text-3xl font-bold text-yellow-400 text-center mb-6">🎯 CS Trust Factor Checker</h1>
 
-        <div class="mt-4 bg-gray-800 p-6 rounded-lg shadow-lg border border-yellow-500">
-            <input type="text" id="steamId" class="w-full p-3 text-lg rounded-md border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-400 focus:outline-none" placeholder="Enter Steam ID">
-            <button onclick="getPlayerInfo()" class="w-full mt-4 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded transition">
+        <div class="mb-4 text-sm text-gray-400 text-center">Demo ID: <span class="font-semibold text-white">76561197960434622</span></div>
+
+        <div class="flex flex-col space-y-4">
+            <input type="text" id="steamId" class="w-full p-3 text-lg rounded border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-400 focus:outline-none" placeholder="Enter Steam ID">
+            <button onclick="getPlayerInfo()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded transition">
                 🔍 Check Trust Factor
             </button>
         </div>
 
-        <div id="output" class="mt-6 text-center"></div>
-
-        <div class="flex justify-center space-x-4 mt-6">
-            <button onclick="sharePage()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center gap-2">
-                🔗 Share Page
-            </button>
-            <button onclick="shareCard()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded flex items-center gap-2">
-                📷 Share Card
-            </button>
-        </div>
+        <div id="output" class="mt-6"></div>
     </div>
     <div class="fixed bottom-4 right-4 text-yellow-400 text-sm">
-        V5
+        V4
     </div>
 </body>
 </html>
