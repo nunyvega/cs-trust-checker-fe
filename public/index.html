@@ -46,7 +46,7 @@
 
   <!-- Version and Disclaimer -->
   <div class="fixed bottom-4 left-4 text-yellow-400 text-sm">
-    v5
+    v6
   </div>
   <div class="fixed bottom-4 right-4 text-gray-400 text-xs bg-gray-800 py-2 px-3 rounded">
     <p>Not affiliated with Valve or Faceit. For informational purposes only.</p>
@@ -78,7 +78,7 @@
       window.history.pushState({}, "", newUrl);
 
       try {
-        const response = await fetch(`${BACKEND_URL}/${steamId}`);
+        const response = await fetch(`${BACKEND_URL}/api/player/${steamId}`);
         const data = await response.json();
 
         if (data.error) {
