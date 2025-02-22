@@ -75,7 +75,7 @@
 
   <!-- Version + Disclaimer -->
   <footer class="w-full flex justify-between items-center mt-6 px-4 md:max-w-2xl md:mx-auto">
-    <div class="text-yellow-400 text-sm">v7</div>
+    <div class="text-yellow-400 text-sm">v8</div>
     <div class="text-gray-400 text-xs bg-gray-800/80 py-2 px-3 rounded-md">
       <p>Not affiliated with Valve or Faceit. For informational purposes only.</p>
     </div>
@@ -175,7 +175,7 @@
                 </div>
               </div>
 
-              <!-- Faceit Data (if any) -->
+              <!-- Single Faceit card (displaying both games) -->
               ${faceitHTML}
             </div>
 
@@ -207,75 +207,80 @@
       }
     }
 
-    // Generate Faceit HTML
+    // Generate Faceit HTML for both CS:GO and CS2, but in a single card
     function generateFaceitHTML(faceit) {
-      // If neither CSGO nor CS2 is present
-      if (!faceit.csgo && !faceit.cs2) {
+      const csgo = faceit.csgo;
+      const cs2  = faceit.cs2;
+
+      // If neither is present, return "no profile" message
+      if (!csgo && !cs2) {
         return `<p class="mt-6 text-gray-400">⚠️ No Faceit profile found.</p>`;
       }
 
-      // Build Faceit blocks
-      const faceitGames = ["csgo", "cs2"].filter(g => faceit[g]);
-
+      // Pick any non-null game as the "primary" info
+      // Typically, the user has the same Faceit ID for both games, but we only need 1 avatar/nickname
+      // We already displayed the Steam avatar above, but if you want Faceit avatar or nickname,
+      // you can do so. For now, let's just keep it minimal. We'll show "Faceit Profile" as a heading,
+      // then each game in a sub-section.
+      
       return `
         <div class="mt-8 text-left">
-          <h3 class="text-lg font-bold text-yellow-400 mb-2">
-            🔥 Faceit Profiles
-          </h3>
-          <div class="flex flex-wrap gap-4 justify-center">
-            ${faceitGames.map(game => {
-              const f = faceit[game];
-              const eloColor =
-                f.elo >= 2000 ? 'text-green-400'
-                : f.elo >= 1500 ? 'text-yellow-400'
-                : 'text-red-400';
-
-              return `
-                <div class="bg-gray-900 p-4 rounded-lg border border-blue-500 text-center w-full md:w-1/2 shadow-md">
-                  <img
-                    src="${f.avatar}"
-                    alt="${game.toUpperCase()} Faceit Avatar"
-                    class="mx-auto w-16 h-16 rounded-full mb-2 object-cover border-2 border-blue-500"
-                  />
-                  <p class="text-base font-semibold mb-1">${f.nickname}</p>
-                  <p><strong>🌎 Region:</strong> ${f.region}</p>
-                  <p><strong>⚡ Skill Level:</strong> ${f.skill_level} / 10</p>
-                  <p class="text-xl font-bold ${eloColor} mt-1">
-                    🔥 ELO: ${f.elo}
-                  </p>
-
-                  ${
-                    f.last_match
-                      ? `
-                        <div class="mt-4 text-left text-sm">
-                          <h4 class="font-bold text-blue-400">🆚 Last Match</h4>
-                          <p><strong>Map:</strong> ${f.last_match.map}</p>
-                          <p><strong>Score:</strong> ${f.last_match.score}</p>
-                          <p><strong>Result:</strong> ${f.last_match.result}</p>
-                          <p><strong>Date:</strong> ${f.last_match.date}</p>
-                        </div>
-                      `
-                      : "<p class='text-gray-400 mt-3 text-sm'>No recent matches found.</p>"
-                  }
-
-                  ${
-                    (f.bans && f.bans.length > 0)
-                      ? `
-                        <div class="mt-4 text-left text-sm">
-                          <h4 class="font-bold text-red-400">🚫 Faceit Bans</h4>
-                          <ul class="list-disc list-inside text-red-300 pl-4">
-                            ${f.bans.map(ban => `
-                              <li><strong>Type:</strong> ${ban.type} – <strong>Reason:</strong> ${ban.reason}</li>
-                            `).join("")}
-                          </ul>
-                        </div>
-                      `
-                      : `<p class="text-green-400 mt-3 text-sm">✅ No Faceit bans.</p>`
-                  }
-                </div>
-              `;
-            }).join("")}
+          <h3 class="text-lg font-bold text-yellow-400 mb-2">🔥 Faceit Profile</h3>
+          <!-- Outer container for both games -->
+          <div class="bg-gray-900 p-4 rounded-lg border border-blue-500 space-y-4">
+            ${renderFaceitGameBlock(csgo, "CS:GO")}
+            ${renderFaceitGameBlock(cs2,  "CS2")}
           </div>
+        </div>
+      `;
+    }
+
+    // Helper: Renders details for a single Faceit game (CS:GO or CS2)
+    function renderFaceitGameBlock(gameObj, label) {
+      if (!gameObj) return ""; // If this game is null, skip it
+
+      const eloColor =
+        gameObj.elo >= 2000 ? "text-green-400"
+        : gameObj.elo >= 1500 ? "text-yellow-400"
+        : "text-red-400";
+
+      // Build HTML for last match (if found)
+      let lastMatchHTML = `<p class="text-gray-400 mt-2 text-sm">No recent matches found.</p>`;
+      if (gameObj.last_match) {
+        lastMatchHTML = `
+          <div class="mt-2 text-sm">
+            <h4 class="font-bold text-blue-300">${label} Last Match</h4>
+            <p><strong>Map:</strong> ${gameObj.last_match.map}</p>
+            <p><strong>Score:</strong> ${gameObj.last_match.score}</p>
+            <p><strong>Result:</strong> ${gameObj.last_match.result}</p>
+            <p><strong>Date:</strong> ${gameObj.last_match.date}</p>
+          </div>
+        `;
+      }
+
+      // Build HTML for bans (if any)
+      let bansHTML = `<p class="text-green-400 mt-2 text-sm">✅ No Faceit bans.</p>`;
+      if (gameObj.bans && gameObj.bans.length > 0) {
+        bansHTML = `
+          <div class="mt-2 text-sm text-red-300">
+            <h4 class="font-bold text-red-400">🚫 Faceit Bans</h4>
+            <ul class="list-disc list-inside">
+              ${gameObj.bans.map(ban => `
+                <li><strong>Type:</strong> ${ban.type} – <strong>Reason:</strong> ${ban.reason}</li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      // Return the single game block
+      return `
+        <div class="bg-gray-800 p-4 rounded-md border border-gray-700 shadow-md">
+          <h4 class="font-bold text-blue-400 mb-1">${label} Stats</h4>
+          <p><strong>Skill Level:</strong> ${gameObj.skill_level} / 10</p>
+          <p class="font-bold ${eloColor}">ELO: ${gameObj.elo}</p>
+          ${lastMatchHTML}
+          ${bansHTML}
         </div>
       `;
     }
