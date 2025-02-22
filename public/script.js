@@ -34,8 +34,8 @@ async function getPlayerInfo() {
                             const faceitInfo = data.faceit[game];
 
                             return `
-                                <div class="bg-gray-800 p-4 rounded-lg border border-blue-500 text-center w-full md:w-1/2">
-                                    <img src="${faceitInfo.avatar}" alt="Faceit Avatar" class="mx-auto w-16 h-16 rounded-full">
+                                <div class="bg-gray-800 p-4 rounded-lg border border-blue-500 text-center w-full md:w-1/2 shadow-md">
+                                    <img src="${faceitInfo.avatar}" alt="Faceit Avatar" class="mx-auto w-20 h-20 rounded-full border border-yellow-400">
                                     <p class="text-lg font-semibold">${faceitInfo.nickname}</p>
                                     <p><strong>🌎 Region:</strong> ${faceitInfo.region}</p>
                                     <p><strong>⚡ Skill Level:</strong> ${faceitInfo.skill_level}/10</p>
@@ -66,40 +66,23 @@ async function getPlayerInfo() {
             }
 
             document.getElementById("output").innerHTML = `
-                <div id="player-card" class="mt-4 p-6 bg-gray-700 rounded-lg border border-yellow-500 shadow-md text-center">
-                    <img src="${data.steam.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md">
+                <div class="mt-4 p-6 bg-gray-800 rounded-lg border border-yellow-500 shadow-lg text-center">
+                    <img src="${data.steam.avatar}" alt="Avatar" class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400">
                     <p class="text-xl font-bold">${data.steam.name}</p>
                     <a href="${data.steam.profileUrl}" target="_blank" class="text-blue-400 hover:underline">View Steam Profile</a>
 
                     <div class="mt-4 text-left space-y-2 text-gray-300">
-                        <p><strong>🆔 Steam ID:</strong> ${data.steam.steamId}</p>
-                        <p><strong>📅 Last Log Off:</strong> ${data.steam.lastLogOff}</p>
                         <p><strong>🕰️ Account Age:</strong> ${data.steam.accountAge} years</p>
                         <p><strong>🎮 CS2 Hours Played:</strong> ${data.steam.hoursPlayed}</p>
-                        <p class="${data.steam.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
-                            <strong>🚫 VAC Bans:</strong> ${data.steam.vacBans}
-                        </p>
-                        <p class="${data.steam.gameBans > 0 ? 'text-red-400' : 'text-green-400'}">
-                            <strong>🚫 Game Bans:</strong> ${data.steam.gameBans}
-                        </p>
-                        <p><strong>🛑 Community Banned:</strong> ${data.steam.communityBanned ? 'Yes' : 'No'}</p>
-                        <p><strong>💰 Economy Ban:</strong> ${data.steam.economyBan}</p>
 
                         <p class="text-2xl mt-4 font-bold ${data.trustFactor >= 700 ? 'text-green-400' : data.trustFactor >= 400 ? 'text-yellow-400' : 'text-red-400'}">
-                            🔥 Trust Factor Score: ${data.trustFactor}/1000
+                            🔥 Trust Factor Score: ${data.trustFactor.toFixed(1)}/1000
                         </p>
                     </div>
 
                     ${faceitContent}
                 </div>
-
-                <div class="mt-4 flex justify-center space-x-4">
-                    <button onclick="sharePage()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">🔗 Share Page</button>
-                    <button onclick="shareCard()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">📷 Share Card</button>
-                </div>
             `;
-        } else {
-            document.getElementById("output").innerHTML = `<p class="text-red-400 text-center">⚠️ No player found.</p>`;
         }
     } catch (error) {
         console.error("Error fetching data:", error);
