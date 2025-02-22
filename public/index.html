@@ -1,31 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="favicon.ico">
-    <title>CS Trust Factor Checker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="favicon.ico"/>
+  <title>CS Trust Factor Checker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg border border-yellow-500">
-        <h1 class="text-3xl font-bold text-yellow-400 text-center mb-6">🎯 CS Trust Factor Checker</h1>
 
-        <div class="mb-4 text-sm text-gray-400 text-center">Demo ID: <span class="font-semibold text-white">76561197960434622</span></div>
+  <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl border border-yellow-500">
+    <h1 class="text-3xl font-bold text-yellow-400 text-center mb-6">🎯 CS Trust Factor Checker</h1>
 
-        <div class="flex flex-col space-y-4">
-            <input type="text" id="steamId" class="w-full p-3 text-lg rounded border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-400 focus:outline-none" placeholder="Enter Steam ID">
-            <button onclick="getPlayerInfo()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded transition">
-                🔍 Check Trust Factor
-            </button>
+    <!-- Ad Banner Placeholder -->
+    <div id="adBanner" class="mb-4 text-center">
+      <!-- Replace this with your actual ad code (e.g., from your ad network or sponsor) -->
+      <div class="inline-block bg-yellow-300 text-black py-2 px-4 rounded">
+        <strong>AD:</strong> Your Skin Store Ad Here
+      </div>
+    </div>
+
+    <!-- Demo ID -->
+    <div class="mb-4 text-sm text-gray-400 text-center">
+      Demo ID: <span class="font-semibold text-white">76561197960434622</span>
+    </div>
+
+    <!-- Input & Button -->
+    <div class="flex flex-col space-y-4">
+      <input
+        type="text"
+        id="steamId"
+        class="w-full p-3 text-lg rounded border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+        placeholder="Enter Steam ID" />
+      <button
+        onclick="getPlayerInfo()"
+        class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded transition">
+        🔍 Check Trust Factor
+      </button>
+    </div>
+
+    <!-- Output Container -->
+    <div id="output" class="mt-6"></div>
+  </div>
+
+  <!-- Version and Disclaimer -->
+  <div class="fixed bottom-4 left-4 text-yellow-400 text-sm">
+    v5
+  </div>
+  <div class="fixed bottom-4 right-4 text-gray-400 text-xs bg-gray-800 py-2 px-3 rounded">
+    <p>Not affiliated with Valve or Faceit. For informational purposes only.</p>
+  </div>
+
+  <script>
+    // ==============================
+    // Replace with your backend URL
+    // ==============================
+    const BACKEND_URL = "https://glorious-space-potato-vpvvqvrqg93xjv7-3000.app.github.dev";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const steamId = urlParams.get("steamId");
+      if (steamId) {
+        document.getElementById("steamId").value = steamId;
+        getPlayerInfo();
+      }
+    });
+
+    async function getPlayerInfo() {
+      const steamId = document.getElementById("steamId").value;
+      if (!steamId) {
+        return alert("Please enter a Steam ID");
+      }
+
+      // Update URL for sharing
+      const newUrl = `${window.location.origin}${window.location.pathname}?steamId=${steamId}`;
+      window.history.pushState({}, "", newUrl);
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/${steamId}`);
+        const data = await response.json();
+
+        if (data.error) {
+          document.getElementById("output").innerHTML = `
+            <p class="text-red-400 text-center">⚠️ ${data.error}</p>
+          `;
+          return;
+        }
+
+        if (data.steam && data.steam.name) {
+          const faceitHTML = generateFaceitHTML(data.faceit);
+
+          // Add a color-coded progress bar for trust factor
+          const trustFactorPercent = (data.trustFactor / 10).toFixed(0);
+          const trustBarColor =
+            data.trustFactor >= 700 ? "bg-green-500"
+            : data.trustFactor >= 400 ? "bg-yellow-400"
+            : "bg-red-600";
+
+          document.getElementById("output").innerHTML = `
+            <div id="player-card" class="mt-4 p-6 bg-gray-700 rounded-lg border border-yellow-500 shadow-md text-center">
+              <img
+                src="${data.steam.avatar}"
+                alt="Avatar"
+                class="mx-auto mb-3 w-24 h-24 rounded-lg border border-yellow-400 shadow-md"/>
+
+              <p class="text-xl font-bold">${data.steam.name}</p>
+              <a href="${data.steam.profileUrl}" target="_blank" class="text-blue-400 hover:underline">
+                View Steam Profile
+              </a>
+
+              <div class="mt-4 text-left space-y-2 text-gray-300">
+                <p><strong>🆔 Steam ID:</strong> ${data.steam.steamId}</p>
+                <p><strong>📅 Last Log Off:</strong> ${data.steam.lastLogOff}</p>
+                <p><strong>🕰️ Account Age:</strong> ${data.steam.accountAge} years</p>
+                <p><strong>🎮 CS2 Hours Played:</strong> ${data.steam.hoursPlayed}</p>
+                <p class="${data.steam.vacBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                  <strong>🚫 VAC Bans:</strong> ${data.steam.vacBans}
+                </p>
+                <p class="${data.steam.gameBans > 0 ? 'text-red-400' : 'text-green-400'}">
+                  <strong>🚫 Game Bans:</strong> ${data.steam.gameBans}
+                </p>
+                <p><strong>🛑 Community Banned:</strong> ${data.steam.communityBanned ? 'Yes' : 'No'}</p>
+                <p><strong>💰 Economy Ban:</strong> ${data.steam.economyBan}</p>
+
+                <div class="mt-4">
+                  <p class="font-bold mb-2">🔥 Trust Factor: ${data.trustFactor} / 1000</p>
+                  <div class="w-full bg-gray-600 rounded-full h-4">
+                    <div class="${trustBarColor} h-4 rounded-full" style="width: ${trustFactorPercent}%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              ${faceitHTML}
+            </div>
+
+            <div class="mt-4 flex justify-center space-x-4">
+              <button onclick="sharePage()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">🔗 Share Page</button>
+              <button onclick="shareCard()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">📷 Share Card</button>
+            </div>
+          `;
+        } else {
+          document.getElementById("output").innerHTML = `
+            <p class="text-red-400 text-center">⚠️ No player found.</p>
+          `;
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        document.getElementById("output").innerHTML = `
+          <p class="text-red-400 text-center">⚠️ Error fetching data.</p>
+        `;
+      }
+    }
+
+    function generateFaceitHTML(faceit) {
+      // If neither CSGO nor CS2 data is present, show no Faceit
+      if (!faceit.csgo && !faceit.cs2) {
+        return `<p class="mt-4 text-gray-400">⚠️ No Faceit profile found.</p>`;
+      }
+
+      return `
+        <h2 class="text-lg mt-6 font-bold text-yellow-400">🔥 Faceit Profiles</h2>
+        <div class="flex flex-wrap gap-4 justify-center">
+          ${["csgo", "cs2"].map(game => {
+            if (!faceit[game]) return "";
+            const f = faceit[game];
+            return `
+              <div class="bg-gray-800 p-4 rounded-lg border border-blue-500 text-center w-full md:w-1/2">
+                <img
+                  src="${f.avatar}"
+                  alt="${game.toUpperCase()} Faceit Avatar"
+                  class="mx-auto w-16 h-16 rounded-full mb-2"
+                />
+                <p class="text-lg font-semibold">${f.nickname}</p>
+                <p><strong>🌎 Region:</strong> ${f.region}</p>
+                <p><strong>⚡ Skill Level:</strong> ${f.skill_level} / 10</p>
+                <p class="text-xl font-bold ${f.elo >= 2000 ? 'text-green-400' : f.elo >= 1500 ? 'text-yellow-400' : 'text-red-400'}">
+                  🔥 ELO: ${f.elo}
+                </p>
+                ${
+                  f.last_match
+                    ? `
+                      <h3 class="text-lg mt-4 font-bold text-blue-400">🆚 Last Match</h3>
+                      <p><strong>Map:</strong> ${f.last_match.map}</p>
+                      <p><strong>Score:</strong> ${f.last_match.score}</p>
+                      <p><strong>Result:</strong> ${f.last_match.result}</p>
+                      <p><strong>Date:</strong> ${f.last_match.date}</p>
+                    `
+                    : "<p class='text-gray-400 mt-2'>No recent matches found.</p>"
+                }
+                ${
+                  f.bans && f.bans.length > 0
+                    ? `
+                      <h3 class="text-lg mt-4 font-bold text-red-400">🚫 Faceit Bans</h3>
+                      <ul class="list-disc list-inside text-red-300">
+                        ${f.bans
+                          .map(ban => `<li><strong>Type:</strong> ${ban.type} - <strong>Reason:</strong> ${ban.reason}</li>`)
+                          .join("")}
+                      </ul>
+                    `
+                    : "<p class='text-green-400 mt-2'>✅ No Faceit bans.</p>"
+                }
+              </div>
+            `;
+          }).join("")}
         </div>
+      `;
+    }
 
-        <div id="output" class="mt-6"></div>
-    </div>
-    <div class="fixed bottom-4 right-4 text-yellow-400 text-sm">
-        V4
-    </div>
+    function sharePage() {
+      const shareUrl = window.location.href;
+      if (navigator.share) {
+        navigator.share({
+          title: "Check this CS Trust Factor!",
+          text: "See this player's trust factor details:",
+          url: shareUrl
+        }).catch(console.error);
+      } else {
+        navigator.clipboard.writeText(shareUrl);
+        alert("✅ Link copied to clipboard!");
+      }
+    }
+
+    async function shareCard() {
+      const playerCard = document.getElementById("player-card");
+      if (!playerCard) {
+        alert("⚠️ No player card to share!");
+        return;
+      }
+      try {
+        const canvas = await html2canvas(playerCard, {
+          useCORS: true,
+          allowTaint: true,
+          scale: 2
+        });
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = "CS_Trust_Factor.png";
+        link.click();
+        alert("✅ Card image saved! You can now share it.");
+      } catch (error) {
+        console.error("Error generating image:", error);
+        alert("⚠️ Failed to generate image.");
+      }
+    }
+  </script>
+
 </body>
 </html>
