@@ -27,7 +27,6 @@
   <main class="w-full max-w-2xl px-4">
     <!-- Advert / Sponsor Banner -->
     <div id="adBanner" class="mb-6 text-center">
-      <!-- Replace this placeholder with your ad code (e.g. from your ad provider) -->
       <div class="inline-block bg-yellow-300 text-black py-2 px-4 rounded-lg shadow-md">
         <strong>AD:</strong> Your Skin Store Ad Here
       </div>
@@ -75,7 +74,7 @@
 
   <!-- Version + Disclaimer -->
   <footer class="w-full flex justify-between items-center mt-6 px-4 md:max-w-2xl md:mx-auto">
-    <div class="text-yellow-400 text-sm">v8</div>
+    <div class="text-yellow-400 text-sm">v9</div>
     <div class="text-gray-400 text-xs bg-gray-800/80 py-2 px-3 rounded-md">
       <p>Not affiliated with Valve or Faceit. For informational purposes only.</p>
     </div>
@@ -121,10 +120,10 @@
 
         // If we have valid data
         if (data.steam && data.steam.name) {
-          const faceitHTML = generateFaceitHTML(data.faceit);
+          // Generate Faceit content
+          const faceitHTML = generateFaceitCard(data.faceit);
+          // Build trust factor progress bar
           const trustFactorPercent = (data.trustFactor / 10).toFixed(0);
-
-          // Decide progress bar color
           const trustBarColor =
             data.trustFactor >= 700 ? "bg-green-500"
             : data.trustFactor >= 400 ? "bg-yellow-400"
@@ -175,7 +174,7 @@
                 </div>
               </div>
 
-              <!-- Single Faceit card (displaying both games) -->
+              <!-- Single Faceit card (with avatar, nickname, game data) -->
               ${faceitHTML}
             </div>
 
@@ -207,80 +206,109 @@
       }
     }
 
-    // Generate Faceit HTML for both CS:GO and CS2, but in a single card
-    function generateFaceitHTML(faceit) {
-      const csgo = faceit.csgo;
-      const cs2  = faceit.cs2;
-
-      // If neither is present, return "no profile" message
-      if (!csgo && !cs2) {
+    // Generate the unified Faceit card
+    function generateFaceitCard(faceit) {
+      if (!faceit || (!faceit.csgo && !faceit.cs2 && !faceit.avatar)) {
         return `<p class="mt-6 text-gray-400">⚠️ No Faceit profile found.</p>`;
       }
 
-      // Pick any non-null game as the "primary" info
-      // Typically, the user has the same Faceit ID for both games, but we only need 1 avatar/nickname
-      // We already displayed the Steam avatar above, but if you want Faceit avatar or nickname,
-      // you can do so. For now, let's just keep it minimal. We'll show "Faceit Profile" as a heading,
-      // then each game in a sub-section.
-      
+      // Build ban summary
+      const banHTML = faceit.bans && faceit.bans.length
+        ? `
+          <div class="mt-3 text-red-300 text-sm">
+            <h4 class="font-bold text-red-400">🚫 Faceit Bans (${faceit.bans.length})</h4>
+            <ul class="list-disc list-inside">
+              ${faceit.bans
+                .map(ban => `
+                  <li><strong>Type:</strong> ${ban.type} – <strong>Reason:</strong> ${ban.reason}</li>
+                `)
+                .join('')}
+            </ul>
+          </div>
+        `
+        : `<p class="text-green-400 mt-2 text-sm">✅ No Faceit bans.</p>`;
+
+      // If we have an avatar or nickname, show them
+      const faceitHeader = faceit.avatar
+        ? `
+          <div class="mt-8 flex items-center gap-3">
+            <img
+              src="${faceit.avatar}"
+              alt="Faceit Avatar"
+              class="w-12 h-12 rounded-full border-2 border-blue-400 object-cover"
+            />
+            <div>
+              <h3 class="text-lg font-bold text-blue-400">${faceit.nickname || "Faceit User"}</h3>
+              <p class="text-xs text-gray-400">Faceit Profile</p>
+            </div>
+          </div>
+        `
+        : ``;
+
+      // Build sub-sections for each game
+      const csgoHTML = faceit.csgo ? renderFaceitGameBlock(faceit.csgo, "CS:GO") : "";
+      const cs2HTML = faceit.cs2 ? renderFaceitGameBlock(faceit.cs2, "CS2") : "";
+
       return `
-        <div class="mt-8 text-left">
-          <h3 class="text-lg font-bold text-yellow-400 mb-2">🔥 Faceit Profile</h3>
-          <!-- Outer container for both games -->
-          <div class="bg-gray-900 p-4 rounded-lg border border-blue-500 space-y-4">
-            ${renderFaceitGameBlock(csgo, "CS:GO")}
-            ${renderFaceitGameBlock(cs2,  "CS2")}
+        <div class="mt-6 text-left bg-gray-900 p-4 rounded-lg border border-blue-500">
+          <!-- Faceit Header -->
+          ${faceitHeader}
+
+          <!-- Faceit Bans -->
+          ${banHTML}
+
+          <!-- CS:GO and/or CS2 blocks -->
+          <div class="mt-4 space-y-4">
+            ${csgoHTML}
+            ${cs2HTML}
           </div>
         </div>
       `;
     }
 
-    // Helper: Renders details for a single Faceit game (CS:GO or CS2)
+    // Renders details for a single Faceit game (CS:GO or CS2),
+    // including skill level, ELO, and up to 5 matches
     function renderFaceitGameBlock(gameObj, label) {
-      if (!gameObj) return ""; // If this game is null, skip it
+      if (!gameObj) return "";
 
       const eloColor =
         gameObj.elo >= 2000 ? "text-green-400"
         : gameObj.elo >= 1500 ? "text-yellow-400"
         : "text-red-400";
 
-      // Build HTML for last match (if found)
-      let lastMatchHTML = `<p class="text-gray-400 mt-2 text-sm">No recent matches found.</p>`;
-      if (gameObj.last_match) {
-        lastMatchHTML = `
-          <div class="mt-2 text-sm">
-            <h4 class="font-bold text-blue-300">${label} Last Match</h4>
-            <p><strong>Map:</strong> ${gameObj.last_match.map}</p>
-            <p><strong>Score:</strong> ${gameObj.last_match.score}</p>
-            <p><strong>Result:</strong> ${gameObj.last_match.result}</p>
-            <p><strong>Date:</strong> ${gameObj.last_match.date}</p>
-          </div>
+      // If we have up to 5 matches, show them in a simple table/list
+      let matchesHTML = "<p class='text-gray-400 text-sm'>No recent matches found.</p>";
+      if (gameObj.matches && gameObj.matches.length > 0) {
+        matchesHTML = `
+          <ul class="mt-2 space-y-1 text-sm">
+            ${gameObj.matches
+              .map(match => `
+                <li class="border-b border-gray-700 pb-1">
+                  <strong>${match.map}:</strong> 
+                  <span class="text-blue-300">${match.score}</span> 
+                  <em class="${match.result === 'Win' ? 'text-green-400' : 'text-red-400'}">(${match.result})</em> 
+                  <span class="text-gray-400">- ${match.started_at}</span>
+                </li>
+              `)
+              .join("")}
+          </ul>
         `;
       }
 
-      // Build HTML for bans (if any)
-      let bansHTML = `<p class="text-green-400 mt-2 text-sm">✅ No Faceit bans.</p>`;
-      if (gameObj.bans && gameObj.bans.length > 0) {
-        bansHTML = `
-          <div class="mt-2 text-sm text-red-300">
-            <h4 class="font-bold text-red-400">🚫 Faceit Bans</h4>
-            <ul class="list-disc list-inside">
-              ${gameObj.bans.map(ban => `
-                <li><strong>Type:</strong> ${ban.type} – <strong>Reason:</strong> ${ban.reason}</li>
-              `).join('')}
-            </ul>
-          </div>
-        `;
-      }
-
-      // Return the single game block
       return `
-        <div class="bg-gray-800 p-4 rounded-md border border-gray-700 shadow-md">
+        <div class="bg-gray-800 p-3 rounded-md border border-gray-700">
           <h4 class="font-bold text-blue-400 mb-1">${label} Stats</h4>
-          <p><strong>Skill Level:</strong> ${gameObj.skill_level} / 10</p>
-          <p class="font-bold ${eloColor}">ELO: ${gameObj.elo}</p>
-          ${lastMatchHTML}
-          ${bansHTML}
+          <p>
+            <strong>Skill Level:</strong> ${gameObj.skill_level} / 10
+          </p>
+          <p class="font-bold ${eloColor}">
+            ELO: ${gameObj.elo}
+          </p>
+
+          <div class="mt-2">
+            <h5 class="font-semibold text-yellow-300 mb-1">${label} Recent Matches</h5>
+            ${matchesHTML}
+          </div>
         </div>
       `;
     }
